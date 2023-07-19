@@ -1,3 +1,4 @@
+// DB연결 상태 미들웨어 . 개발중
 function authMiddleWare(connection) {
   return (req, res, next) => {
     console.log(connection);
