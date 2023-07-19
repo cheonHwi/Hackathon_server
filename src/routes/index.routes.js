@@ -1,23 +1,16 @@
-const { createConnection } = require("../config/mysqlConnection");
 const { selectTest } = require("../sql/query");
+const { getConnection } = require("../config/mysqlConnection");
+const { authMiddleWare } = require("../middleware/database.middleware");
 
 const indexRouter = require("express").Router();
 
-const connection = createConnection();
+const connection = getConnection();
+
+indexRouter.use(authMiddleWare(connection));
 
 indexRouter.get("/", (req, res) => {
-  if (connection.connected) {
-    res.sendStatus(400);
-    return;
-  }
-  connection.query(selectTest, function (err, results, fields) {
-    // console.log(results);
-    if (results.length !== 0) {
-      res.status(200).json(results);
-    } else {
-      res.status(400).json(false);
-    }
-  });
+  console.log("main routes");
+  res.send(connection);
 });
 
 // inde;
