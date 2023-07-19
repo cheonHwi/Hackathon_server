@@ -2,10 +2,11 @@
 function authMiddleWare(connection) {
   return (req, res, next) => {
     console.log(connection);
-    if (!connection) {
+    if (connection) {
       console.log("fail");
       res.status(404).send();
       return;
+      // next();
     } else {
       console.log("success");
       next();

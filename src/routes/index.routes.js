@@ -1,18 +1,45 @@
-const { selectTest } = require("../sql/query");
-const { getConnection } = require("../config/mysqlConnection");
 const { authMiddleWare } = require("../middleware/database.middleware");
+
+const db = require("../config/config");
 
 const indexRouter = require("express").Router();
 
-const connection = getConnection();
-
-indexRouter.use(authMiddleWare(connection));
+const User = db.users;
 
 indexRouter.get("/", (req, res) => {
-  console.log("main routes");
-  res.send(connection);
+  res.send("asd");
 });
 
-// inde;
+indexRouter.post("/users", (req, res) => {
+  const { firstName, lastName, hasCar } = req.body;
+
+  const user = {
+    firstName,
+    lastName,
+    hasCar,
+  };
+
+  User.create(user)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "유저를 생성하는데 에러가 발생했습니다.",
+      });
+    });
+});
+
+indexRouter.get("/users", (req, res) => {
+  User.findAll()
+    .then((users) => {
+      res.send(users);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "유저 정보를 가져오는데 실패했습니다.",
+      });
+    });
+});
 
 module.exports = indexRouter;
