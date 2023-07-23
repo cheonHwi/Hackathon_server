@@ -7,10 +7,14 @@ import { userRepository } from "../repository";
 //   });
 // };
 
-export const save = async () => {
-  const user = await userRepository.save({ id: "ryuwoong" }).then((res) => {
-    // console.log(res);
-    return res;
-  });
+export const save = async (username: string) => {
+  const user = await userRepository
+    .save({ id: username })
+    .then((res) => {
+      return res;
+    })
+    .catch((err) => {
+      throw err;
+    });
   return user;
 };
