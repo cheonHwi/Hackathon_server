@@ -15,7 +15,7 @@ export const inbody_result_OCR = async (): Promise<any> => {
 
     const [result] = await client.textDetection(picturePath);
     const labels: any = result.textAnnotations;
-    //   console.log(typeof labels);
+    // console.log(typeof labels);
     // labels.forEach((label: any) => console.log(label.description));
     resolve(labels);
   });
