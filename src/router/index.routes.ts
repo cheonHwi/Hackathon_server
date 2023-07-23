@@ -1,7 +1,7 @@
 import express, { Request, Response, Router } from "express";
 
 import { inbody_result_OCR } from "../controllers/ocr.controller";
-import { save } from "../controllers/user.controller";
+import { allUserFind, userDataSave } from "../controllers/user.controller";
 
 const indexRouter: Router = express.Router();
 
@@ -12,11 +12,20 @@ indexRouter.get("/", (req: Request, res: Response) =>
 indexRouter.get("/save", async (req: Request, res: Response) => {
   const { username } = req.body;
   if (!username) return res.sendStatus(400);
-  save(username)
-    .then((response) => {
+  userDataSave(username)
+    .then((response: any) => {
       res.status(200).send(response);
     })
-    .catch((err) => res.sendStatus(503));
+    .catch((err: any) => res.sendStatus(503));
+});
+
+indexRouter.get("/find", async (req: Request, res: Response) => {
+  allUserFind()
+    .then((result: Array<object>) => {
+      if (!result.length) return res.sendStatus(404);
+      return res.status(200).json(result);
+    })
+    .catch((err: any) => res.sendStatus(503));
 });
 
 // indexRouter.get("/update", async (req: Request, res: Response) => {
@@ -25,12 +34,6 @@ indexRouter.get("/save", async (req: Request, res: Response) => {
 //     { id: "ryuwoong1" }
 //   );
 //   return res.status(200).json(user);
-// });
-
-// indexRouter.get("/find", async (req: Request, res: Response) => {
-//   const user1 = await userRepository.find({ where: { id: "ryuwoong1" } });
-
-//   return res.status(200).json(user1);
 // });
 
 indexRouter.get("/ocr", async (req: Request, res: Response) => {

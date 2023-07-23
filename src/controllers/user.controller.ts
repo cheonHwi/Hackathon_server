@@ -1,14 +1,7 @@
 import { userRepository } from "../repository";
 
-// export const save = (): Promise<object> => {
-//   return new Promise(async (resolve, reject) => {
-//     const user = await userRepository.save({ id: "ryuwoong" });
-//     resolve(user);
-//   });
-// };
-
-export const save = async (username: string) => {
-  const user = await userRepository
+export const userDataSave = async (username: string) => {
+  const saved_user = await userRepository
     .save({ id: username })
     .then((res) => {
       return res;
@@ -16,5 +9,18 @@ export const save = async (username: string) => {
     .catch((err) => {
       throw err;
     });
-  return user;
+  return saved_user;
+};
+
+export const allUserFind = async () => {
+  const any_userData = await userRepository
+    .find({})
+    .then((res) => {
+      return res;
+    })
+    .catch((err) => {
+      throw err;
+    });
+
+  return any_userData;
 };
