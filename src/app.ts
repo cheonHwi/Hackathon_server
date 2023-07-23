@@ -8,7 +8,7 @@ import { AppDataSource } from "./config/data-source";
 import indexRouter from "./router/index.routes";
 
 const app: express.Application = express();
-const PORT: number = 3000;
+const PORT: string = process.env.PORT || "3000";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
