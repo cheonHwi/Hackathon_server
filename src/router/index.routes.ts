@@ -35,7 +35,7 @@ indexRouter.get("/find", async (req: Request, res: Response) => {
 //   );
 //   return res.status(200).json(user);
 // });
-
+// 나도 잘 모르겠다.
 indexRouter.get("/ocr", async (req: Request, res: Response) => {
   inbody_result_OCR().then((labels: any) =>
     // labels.forEach((label: any) => console.log(label.description))
