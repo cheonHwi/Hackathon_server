@@ -13,6 +13,6 @@ export default class User {
   @Column({ type: "varchar", length: 30, comment: "회원 아이디" })
   id: string;
 
-  @CreateDateColumn({ comment: "회원 생성 날짜" })
+  @CreateDateColumn({ comment: "회원 생성일자" })
   created_at: Date;
 }
