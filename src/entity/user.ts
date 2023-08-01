@@ -8,12 +8,6 @@ export default class User {
   @Column({ type: "varchar", length: 30, comment: "회원 이름" })
   name: string;
 
-  @Column({ type: "varchar" })
-  email: string;
-
-  @Column({ type: "varchar", comment: "프로필 사진 주소" })
-  picture: string;
-
   @Column({ type: "varchar", comment: "소속" })
   affiliation: string;
 
