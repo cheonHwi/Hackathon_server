@@ -14,6 +14,15 @@ export default class User {
   @Column({ type: "varchar", comment: "프로필 사진 주소" })
   picture: string;
 
+  @Column({ type: "varchar", comment: "소속" })
+  affiliation: string;
+
+  @Column({ type: "varchar", comment: "부대" })
+  army_unit: string;
+
+  @Column({ type: "date", comment: "입대일자" })
+  enlistment_date: Date;
+
   @CreateDateColumn({ comment: "회원 생성일자" })
   created_at: Date;
 }
