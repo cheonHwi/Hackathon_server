@@ -18,7 +18,7 @@ indexRouter.post("/getUserData", async (req: Request, res: Response) => {
   );
 
   const googleUserData = userDataRes.data;
-  res.json(googleUserData.id);
+  res.json(googleUserData);
 });
 
 indexRouter.post("/save", async (req: Request, res: Response) => {

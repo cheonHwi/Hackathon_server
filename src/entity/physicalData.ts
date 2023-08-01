@@ -11,7 +11,7 @@ export default class PhysicalData {
   @Column({ type: "int", comment: "나이" })
   ages: number;
 
-  @Column({ type: "datetime", comment: "성장/인바디 점수" })
+  @Column({ type: "datetime", comment: "기입일자" })
   inspection_date: Date;
 
   // 체성분 분석 5요소.
