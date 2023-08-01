@@ -12,13 +12,18 @@ indexRouter.get("/", (req: Request, res: Response) =>
 indexRouter.post("/getUserData", async (req: Request, res: Response) => {
   const { token } = req.body;
   if (!token) return res.sendStatus(401);
-  const userDataRes = await axios.get(
-    `https://www.googleapis.com/oauth2/v2/userinfo`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+  try {
+    const userDataRes = await axios.get(
+      `https://www.googleapis.com/oauth2/v2/userinfo`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-  const googleUserData = userDataRes.data;
-  res.json(googleUserData);
+    const googleUserData = userDataRes.data;
+    res.json(googleUserData);
+  } catch (err) {
+    console.log(err);
+    res.status(503).send("Unknown Error");
+  }
 });
 
 indexRouter.post("/save", async (req: Request, res: Response) => {

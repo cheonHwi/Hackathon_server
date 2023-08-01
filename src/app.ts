@@ -1,14 +1,15 @@
 import "dotenv/config";
 import "reflect-metadata";
+
 import cors from "cors";
 import morgan from "morgan";
 import express from "express";
 
 import { AppDataSource } from "./config/data-source";
 
+import dataRouter from "./router/data.routes";
 import indexRouter from "./router/index.routes";
 import googleRouter from "./router/google.routes";
-import dataRouter from "./router/data.routes";
 
 const app: express.Application = express();
 const PORT: string = process.env.PORT || "3000";

@@ -43,23 +43,8 @@ googleRouter.get(
 
       const googleUserData = userDataRes.data;
       console.log(googleUserData);
-      const { id, email, name, picture } = googleUserData;
 
-      res.cookie(
-        "googleUserData",
-        {
-          id,
-          email,
-          name,
-          picture,
-        },
-        {
-          httpOnly: false,
-          secure: true,
-        }
-      );
-
-      res.json({ email, name, picture });
+      res.json(googleUserData);
     } catch (error) {
       console.error(error);
       res.status(400).send("Bad request");
