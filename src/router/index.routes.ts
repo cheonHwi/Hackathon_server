@@ -1,6 +1,6 @@
+import axios from "axios";
 import express, { Request, Response, Router } from "express";
 
-import { inbody_result_OCR } from "../controllers/ocr.controller";
 import { allUserFind, userDataSave } from "../controllers/user.controller";
 
 const indexRouter: Router = express.Router();
@@ -9,10 +9,22 @@ indexRouter.get("/", (req: Request, res: Response) =>
   res.status(200).send("Hello World")
 );
 
-indexRouter.get("/save", async (req: Request, res: Response) => {
-  const { username } = req.body;
-  if (!username) return res.sendStatus(400);
-  userDataSave(username)
+indexRouter.post("/getUserData", async (req: Request, res: Response) => {
+  const { token } = req.body;
+  if (!token) return res.sendStatus(401);
+  const userDataRes = await axios.get(
+    `https://www.googleapis.com/oauth2/v2/userinfo`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+
+  const googleUserData = userDataRes.data;
+  res.json(googleUserData);
+});
+
+indexRouter.post("/save", async (req: Request, res: Response) => {
+  const { id, name, email, picture } = req.body;
+  if (!name || !id) return res.sendStatus(400);
+  userDataSave(id, name, email, picture)
     .then((response: any) => {
       res.status(200).send(response);
     })
@@ -36,11 +48,11 @@ indexRouter.get("/find", async (req: Request, res: Response) => {
 //   return res.status(200).json(user);
 // });
 
-indexRouter.get("/ocr", async (req: Request, res: Response) => {
-  inbody_result_OCR().then((labels: any) =>
-    // labels.forEach((label: any) => console.log(label.description))
-    res.status(200).send(labels[0].description)
-  );
-});
+// indexRouter.get("/ocr", async (req: Request, res: Response) => {
+//   inbody_result_OCR().then((labels: any) => {
+//     labels.forEach((label: any) => console.log(label.description));
+//     res.status(200).send(labels[0].description);
+//   });
+// });
 
 export default indexRouter;

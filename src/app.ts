@@ -8,6 +8,7 @@ import { AppDataSource } from "./config/data-source";
 
 import indexRouter from "./router/index.routes";
 import googleRouter from "./router/google.routes";
+import dataRouter from "./router/data.routes";
 
 const app: express.Application = express();
 const PORT: string = process.env.PORT || "3000";
@@ -18,7 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(morgan("dev"));
 
-app.use("/", indexRouter);
+app.use("/data", dataRouter);
+app.use("/user", indexRouter);
 app.use("/GoogleLogin", googleRouter);
 
 AppDataSource.initialize().then(() => console.log("☘️ DB Connection")); // 추가

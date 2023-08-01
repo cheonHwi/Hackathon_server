@@ -1,8 +1,13 @@
 import { userRepository } from "../repository";
 
-export const userDataSave = async (username: string) => {
+export const userDataSave = async (
+  id: number,
+  name: string,
+  email: string,
+  picture: string
+) => {
   const saved_user = await userRepository
-    .save({ id: username })
+    .save({ id, name, email, picture })
     .then((res) => {
       return res;
     })
