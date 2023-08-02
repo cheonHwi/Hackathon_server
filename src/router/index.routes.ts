@@ -1,7 +1,11 @@
 import axios from "axios";
 import express, { Request, Response, Router } from "express";
 
-import { allUserFind, userDataSave } from "../controllers/user.controller";
+import {
+  allUserFind,
+  findOneUser,
+  userDataSave,
+} from "../controllers/user.controller";
 
 const indexRouter: Router = express.Router();
 
@@ -19,7 +23,11 @@ indexRouter.post("/getUserData", async (req: Request, res: Response) => {
     );
 
     const { id, name } = userDataRes.data;
-    res.send({ id, name });
+    findOneUser(id).then((result) => {
+      if (!result) console.log("signup");
+      else res.send(result);
+    });
+    // res.send({ id, name });
   } catch (err) {
     console.log(err);
     res.status(503).send("Unknown Error");

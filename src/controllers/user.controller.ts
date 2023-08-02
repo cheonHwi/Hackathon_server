@@ -1,7 +1,7 @@
 import { userRepository } from "../repository";
 
 export const userDataSave = async (
-  id: number,
+  id: string,
   name: string,
   email: string,
   picture: string
@@ -20,6 +20,19 @@ export const userDataSave = async (
 export const allUserFind = async () => {
   const any_userData = await userRepository
     .find({})
+    .then((res) => {
+      return res;
+    })
+    .catch((err) => {
+      throw err;
+    });
+
+  return any_userData;
+};
+
+export const findOneUser = async (id: string) => {
+  const any_userData = await userRepository
+    .findOne({ where: { id } })
     .then((res) => {
       return res;
     })

@@ -7,6 +7,7 @@ import express from "express";
 
 import { AppDataSource } from "./config/data-source";
 
+import mapRouter from "./router/map.routes";
 import dataRouter from "./router/data.routes";
 import indexRouter from "./router/index.routes";
 import googleRouter from "./router/google.routes";
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(morgan("dev"));
 
+app.use("/map", mapRouter);
 app.use("/data", dataRouter);
 app.use("/user", indexRouter);
 app.use("/GoogleLogin", googleRouter);

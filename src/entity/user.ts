@@ -1,15 +1,9 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-} from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
 export default class User {
-  @PrimaryColumn({ type: "int", comment: "google_oauth id" })
-  id: number;
+  @PrimaryColumn({ type: "varchar", comment: "google_oauth id" })
+  id: string;
 
   //
   // @PrimaryGeneratedColumn()
