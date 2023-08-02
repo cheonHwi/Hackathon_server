@@ -18,8 +18,8 @@ indexRouter.post("/getUserData", async (req: Request, res: Response) => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    const googleUserData = userDataRes.data;
-    res.json(googleUserData);
+    const { id, name } = userDataRes.data;
+    res.send({ id, name });
   } catch (err) {
     console.log(err);
     res.status(503).send("Unknown Error");
