@@ -8,7 +8,7 @@ import {
 
 @Entity()
 export default class User {
-  @PrimaryColumn({ type: "varchar", comment: "google_oauth id" })
+  @PrimaryColumn({ type: "int", comment: "google_oauth id" })
   id: number;
 
   //

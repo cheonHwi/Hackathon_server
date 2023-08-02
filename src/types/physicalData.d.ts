@@ -13,5 +13,20 @@ export interface PhysicalDataJson {
   body_fat_percentage: number;
   inbody_score: number;
 }
-
 // ('110626999320798511586', 168.4, 17.7, 2023.07.18. 15:29, 33.6, 9.1, 3.35, 13.0, 59.0, 25.5, 20.8, 22.1, 84)
+
+// {
+//   id: '1231412'
+//   height: '168.4',
+//   ages: '17.7',
+//   inspection_date: '2023.07.18.15:29',
+//   body_water: '33.6',
+//   protein: '9.1',
+//   minerals: '3.35',
+//   body_fat: '13.0',
+//   weight: '59.0',
+//   skeletal_muscle_mass: '25.5',
+//   bmi: '20.8',
+//   body_fat_percentage: '22.1',
+//   inbody_score: '84',
+// }

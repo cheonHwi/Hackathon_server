@@ -52,7 +52,7 @@ dataRouter.post(
       .then((result) => {
         if (result.status !== 200) return res.sendStatus(500);
         result.data["id"] = "1231412";
-        console.log(result.data);
+        // console.log(result.data);
         // 파일 삭제
         if (file_name && fs.existsSync(path.join(tmpFilePath, file_name))) {
           try {

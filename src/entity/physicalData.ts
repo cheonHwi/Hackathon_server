@@ -1,8 +1,11 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export default class PhysicalData {
-  @PrimaryColumn({ type: "varchar", comment: "google_oauth id" })
+  @PrimaryGeneratedColumn({ type: "int" })
+  idx: number;
+
+  @Column({ type: "int", comment: "google_oauth id" })
   id: number;
 
   @Column({ type: "int", comment: "신장" })
