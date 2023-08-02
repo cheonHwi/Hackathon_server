@@ -6,6 +6,7 @@ import express, { Request, Response, Router } from "express";
 import { physicalRepository, userRepository } from "../repository";
 import { multerConfig } from "../config/multer-config";
 import path from "path";
+import { physicalDataSave } from "../controllers/data.controller";
 
 const dataRouter: Router = express.Router();
 const upload = multer(multerConfig);
@@ -36,6 +37,7 @@ dataRouter.post(
   upload.single("image"),
   (req: Request, res: Response) => {
     const tmpFilePath = path.join(__dirname, "../../../tmp");
+    const { id } = req.body;
     const file = req.file;
     const file_name = req.file?.filename;
     if (!file) {
@@ -48,7 +50,10 @@ dataRouter.post(
         file_name,
       })
       .then((result) => {
+        if (result.status !== 200) return res.sendStatus(500);
+        result.data["id"] = "1231412";
         console.log(result.data);
+        // 파일 삭제
         if (file_name && fs.existsSync(path.join(tmpFilePath, file_name))) {
           try {
             fs.unlinkSync(path.join(tmpFilePath, file_name));
@@ -57,7 +62,25 @@ dataRouter.post(
             console.log(error);
           }
         }
-        res.send(result.data);
+        physicalDataSave(result.data)
+          .then((response: any) => {
+            res.status(200).send(response);
+          })
+          .catch((err: any) => res.sendStatus(503));
+
+        // res.send(result.data);
+      })
+      .catch((err) => {
+        console.log(err);
+        if (file_name && fs.existsSync(path.join(tmpFilePath, file_name))) {
+          try {
+            fs.unlinkSync(path.join(tmpFilePath, file_name));
+            console.log("image delete");
+          } catch (error) {
+            console.log(error);
+          }
+        }
+        res.sendStatus(500);
       });
     // res.json({ message: "File uploaded successfully." });
   }
