@@ -8,6 +8,7 @@ import {
   findOneUser,
   userDataSave,
 } from "../controllers/user.controller";
+import { UserData } from "../types/physicalData";
 
 const indexRouter: Router = express.Router();
 
@@ -16,7 +17,6 @@ indexRouter.get("/", (req: Request, res: Response) =>
 );
 
 indexRouter.post("/login", async (req: Request, res: Response) => {
-  console.log(req.cookies);
   const { token } = req.body;
   if (!token) return res.sendStatus(401);
   try {
@@ -27,32 +27,51 @@ indexRouter.post("/login", async (req: Request, res: Response) => {
 
     const googleUserData = userDataRes.data;
 
-    const userData = findOneUser(googleUserData.id).then((res) =>
-      console.log(res)
-    );
+    const tokenUserData: UserData = {
+      id: googleUserData.id,
+      name: googleUserData.name,
+      affiliation: null,
+      army_unit: null,
+      enlistment_date: null,
+      is_verified: false,
+    };
 
-    const accessToken = jwt.sign(
-      googleUserData,
-      process.env.ACCESS_SECRET as string, // 일종의 salt
-      { expiresIn: "1h" } // 옵션 중에서 만료기간
-    );
-
-    const refreshToken = jwt.sign(
-      googleUserData,
-      process.env.REFRESH_SECRET as string,
-      {
-        expiresIn: "1d",
+    findOneUser(googleUserData.id).then((result) => {
+      if (!result) {
+        userDataSave(googleUserData.id, googleUserData.name);
       }
-    );
+      if (result?.affiliation && result.army_unit && result.enlistment_date) {
+        tokenUserData.affiliation = result?.affiliation;
+        tokenUserData.army_unit = result?.army_unit;
+        tokenUserData.enlistment_date = new Date(result?.enlistment_date);
+        tokenUserData.is_verified = result?.is_verified;
+      }
 
-    // 토큰 전달하기
-    res
-      .cookie("refreshToken", refreshToken, {
-        sameSite: "none",
-        httpOnly: true,
-      })
-      .status(200)
-      .json({ data: { accessToken }, message: "ok" });
+      console.log(tokenUserData);
+
+      const accessToken = jwt.sign(
+        tokenUserData,
+        process.env.ACCESS_SECRET as string, // 일종의 salt
+        { expiresIn: "1h" } // 옵션 중에서 만료기간
+      );
+
+      const refreshToken = jwt.sign(
+        tokenUserData,
+        process.env.REFRESH_SECRET as string,
+        {
+          expiresIn: "1d",
+        }
+      );
+
+      // 토큰 전달하기
+      res
+        .cookie("refreshToken", refreshToken, {
+          sameSite: "none",
+          httpOnly: true,
+        })
+        .status(200)
+        .json({ data: { accessToken }, message: "ok" });
+    });
   } catch (err) {
     console.log(err);
     res.status(503).send("Unknown Error");

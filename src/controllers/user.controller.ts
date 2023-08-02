@@ -3,9 +3,9 @@ import { userRepository } from "../repository";
 export const userDataSave = async (
   id: string,
   name: string,
-  affiliation: string,
-  army_unit: string,
-  enlistment_date: string
+  affiliation?: string,
+  army_unit?: string,
+  enlistment_date?: string
 ) => {
   const saved_user = await userRepository
     .save({ id, name, affiliation, army_unit, enlistment_date })
