@@ -1,5 +1,5 @@
 export interface PhysicalDataJson {
-  id: number;
+  id: string;
   height: number;
   ages: number;
   inspection_date: Date;

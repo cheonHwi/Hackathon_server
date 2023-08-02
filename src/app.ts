@@ -4,6 +4,7 @@ import "reflect-metadata";
 import cors from "cors";
 import morgan from "morgan";
 import express from "express";
+import cookieParser from "cookie-parser";
 
 import { AppDataSource } from "./config/data-source";
 
@@ -16,6 +17,8 @@ const app: express.Application = express();
 const PORT: string = process.env.PORT || "3000";
 
 app.use(cors());
+
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -1,12 +1,13 @@
-import axios from "axios";
 import fs from "fs";
+import path from "path";
+import axios from "axios";
 import multer from "multer";
 import express, { Request, Response, Router } from "express";
 
-import { physicalRepository, userRepository } from "../repository";
 import { multerConfig } from "../config/multer-config";
-import path from "path";
+import { PhysicalData } from "../entity";
 import { physicalDataSave } from "../controllers/data.controller";
+import { physicalRepository, userRepository } from "../repository";
 
 const dataRouter: Router = express.Router();
 const upload = multer(multerConfig);
@@ -15,16 +16,37 @@ dataRouter.get("/", (req: Request, res: Response) =>
   res.status(200).send("Hello World")
 );
 
+dataRouter.post("/getCurrentInfo", async (req: Request, res: Response) => {
+  const { id } = req.body;
+  if (!id) return res.sendStatus(405);
+  physicalRepository
+    .findOne({ where: { id }, order: { idx: "DESC" } })
+    .then((result) => res.json(result));
+});
+
 // 전체 랭킹 조회 api
 dataRouter.get("/rank", async (req: Request, res: Response) => {
   try {
-    const queryResult = await userRepository
+    const rankings = await userRepository
       .createQueryBuilder("user")
-      .innerJoin("physical_data", "data", "user.id = data.id")
-      .select(["user.id", "user.name", "data.inbody_score"])
+      .select("user.id", "id")
+      .select("user.name", "name")
+      .addSelect("MAX(physicalData.inbody_score)", "max_inbody_score")
+      .leftJoin("physical_data", "physicalData", "user.id = physicalData.id")
+      .groupBy("user.id")
+      .having("max_inbody_score IS NOT NULL")
+      .orderBy("max_inbody_score", "DESC")
       .getRawMany();
 
-    res.json(queryResult);
+    const rankedUsers = await userRepository
+      .createQueryBuilder("u")
+      .leftJoin(PhysicalData, "p", `p.id = u.id AND p.inbody_score IS NOT NULL`)
+      .where(`p.idx IS NOT NULL`)
+      .orderBy("p.inbody_score", "DESC")
+      .addOrderBy("p.inspection_date", "DESC") // To handle ties with the same inbody_score
+      .getMany();
+
+    res.json(rankedUsers);
   } catch (error) {
     console.error("Error while joining tables:", error);
     res.status(503).send("Unknown Error");
@@ -51,8 +73,8 @@ dataRouter.post(
       })
       .then((result) => {
         if (result.status !== 200) return res.sendStatus(500);
-        result.data["id"] = "1231412";
         // console.log(result.data);
+        result.data["id"] = "110626999320798511586";
         // 파일 삭제
         if (file_name && fs.existsSync(path.join(tmpFilePath, file_name))) {
           try {
@@ -64,7 +86,7 @@ dataRouter.post(
         }
         physicalDataSave(result.data)
           .then((response: any) => {
-            res.status(200).send(response);
+            res.status(201).send(response);
           })
           .catch((err: any) => res.sendStatus(503));
 

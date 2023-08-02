@@ -1,4 +1,6 @@
+import "dotenv/config";
 import axios from "axios";
+import jwt from "jsonwebtoken";
 import express, { Request, Response, Router } from "express";
 
 import {
@@ -13,7 +15,8 @@ indexRouter.get("/", (req: Request, res: Response) =>
   res.status(200).send("Hello World")
 );
 
-indexRouter.post("/getUserData", async (req: Request, res: Response) => {
+indexRouter.post("/login", async (req: Request, res: Response) => {
+  console.log(req.cookies);
   const { token } = req.body;
   if (!token) return res.sendStatus(401);
   try {
@@ -22,12 +25,34 @@ indexRouter.post("/getUserData", async (req: Request, res: Response) => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    const { id, name } = userDataRes.data;
-    findOneUser(id).then((result) => {
-      if (!result) console.log("signup");
-      else res.send(result);
-    });
-    // res.send({ id, name });
+    const googleUserData = userDataRes.data;
+
+    const userData = findOneUser(googleUserData.id).then((res) =>
+      console.log(res)
+    );
+
+    const accessToken = jwt.sign(
+      googleUserData,
+      process.env.ACCESS_SECRET as string, // 일종의 salt
+      { expiresIn: "1h" } // 옵션 중에서 만료기간
+    );
+
+    const refreshToken = jwt.sign(
+      googleUserData,
+      process.env.REFRESH_SECRET as string,
+      {
+        expiresIn: "1d",
+      }
+    );
+
+    // 토큰 전달하기
+    res
+      .cookie("refreshToken", refreshToken, {
+        sameSite: "none",
+        httpOnly: true,
+      })
+      .status(200)
+      .json({ data: { accessToken }, message: "ok" });
   } catch (err) {
     console.log(err);
     res.status(503).send("Unknown Error");
@@ -35,9 +60,9 @@ indexRouter.post("/getUserData", async (req: Request, res: Response) => {
 });
 
 indexRouter.post("/save", async (req: Request, res: Response) => {
-  const { id, name, email, picture } = req.body;
+  const { id, name, unit, belong, date } = req.body;
   if (!name || !id) return res.sendStatus(400);
-  userDataSave(id, name, email, picture)
+  userDataSave(id, name, unit, belong, date)
     .then((response: any) => {
       res.status(200).send(response);
     })
