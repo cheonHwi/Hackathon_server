@@ -8,6 +8,7 @@ import { multerConfig } from "../config/multer-config";
 import { PhysicalData } from "../entity";
 import { physicalDataSave } from "../controllers/data.controller";
 import { physicalRepository, userRepository } from "../repository";
+import { Between } from "typeorm";
 
 const dataRouter: Router = express.Router();
 const upload = multer(multerConfig);
@@ -15,6 +16,67 @@ const upload = multer(multerConfig);
 dataRouter.get("/", (req: Request, res: Response) =>
   res.status(200).send("Hello World")
 );
+
+dataRouter.get("/variation", (req: Request, res: Response) => {
+  async function getInBodyScoreRangesWithAverage() {
+    const scoreRanges = [];
+    const minScore = 30;
+    const maxScore = 129;
+    const interval = 20;
+
+    // Loop through the score ranges and perform calculations for each range
+    for (let i = minScore; i <= maxScore; i += interval) {
+      const inbodyScores = await physicalRepository.find({
+        where: { inbody_score: Between(i, i + interval - 1) },
+      });
+
+      const count = inbodyScores.length;
+      scoreRanges.push({ range: `${i}-${i + interval - 1}`, count });
+    }
+
+    return scoreRanges;
+  }
+  async function getInBodyScoreAverage() {
+    const average = await physicalRepository
+      .createQueryBuilder("physicalData")
+      .select("AVG(physicalData.inbody_score)", "average")
+      .getRawOne();
+
+    return average.average;
+  }
+
+  // Example usage:
+  getInBodyScoreRangesWithAverage()
+    .then(async (scoreRanges) => {
+      console.log(scoreRanges);
+      getInBodyScoreAverage().then((result) => {
+        res.status(200).json({ dataArray: scoreRanges, avg: result });
+      });
+      // res.send(scoreRanges);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+});
+
+dataRouter.post("/getLineData", async (req: Request, res: Response) => {
+  const { id } = req.body;
+  if (!id) return res.sendStatus(402);
+  try {
+    const inbodyScores = await physicalRepository
+      .createQueryBuilder("physicalData")
+      .select("physicalData.inbody_score", "inbody_score")
+      .where("physicalData.id = :id", { id })
+      .orderBy("physicalData.inspection_date", "DESC")
+      .limit(5)
+      .getRawMany();
+
+    res.json(inbodyScores);
+  } catch (error) {
+    console.error("Error while joining tables:", error);
+    res.status(503).send("Unknown Error");
+  }
+});
 
 dataRouter.post("/getCurrentInfo", async (req: Request, res: Response) => {
   const { id } = req.body;
@@ -46,18 +108,11 @@ dataRouter.get("/rank", async (req: Request, res: Response) => {
       .leftJoin("physical_data", "physicalData", "user.id = physicalData.id")
       .groupBy("user.id")
       .having("max_inbody_score IS NOT NULL")
+      .limit(3)
       .orderBy("max_inbody_score", "DESC")
       .getRawMany();
 
-    const rankedUsers = await userRepository
-      .createQueryBuilder("u")
-      .leftJoin(PhysicalData, "p", `p.id = u.id AND p.inbody_score IS NOT NULL`)
-      .where(`p.idx IS NOT NULL`)
-      .orderBy("p.inbody_score", "DESC")
-      .addOrderBy("p.inspection_date", "DESC") // To handle ties with the same inbody_score
-      .getMany();
-
-    res.json(rankedUsers);
+    res.json(rankings);
   } catch (error) {
     console.error("Error while joining tables:", error);
     res.status(503).send("Unknown Error");
