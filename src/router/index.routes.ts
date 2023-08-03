@@ -10,12 +10,25 @@ import {
   userDataUpdate,
 } from "../controllers/user.controller";
 import { UserData } from "../types/physicalData";
+import { userRepository } from "../repository";
 
 const indexRouter: Router = express.Router();
 
 indexRouter.get("/", (req: Request, res: Response) =>
   res.status(200).send("Hello World")
 );
+
+indexRouter.post("/addDataLogin", async (req: Request, res: Response) => {
+  const { id } = req.body;
+  console.log(id);
+  findOneUser(id).then((result) => {
+    if (!result) {
+      res.sendStatus(503);
+    }
+    console.log(result);
+    res.status(201).json(result);
+  });
+});
 
 indexRouter.post("/login", async (req: Request, res: Response) => {
   const { token } = req.body;
@@ -91,8 +104,8 @@ indexRouter.post("/verify", async (req: Request, res: Response) => {
 indexRouter.post("/addAdditionalData", async (req: Request, res: Response) => {
   const { id } = req.body;
   if (!id) return res.sendStatus(402);
-  userDataUpdate(id, { ...req.body })
-    .then((result) => {
+  await userDataUpdate(id, { ...req.body })
+    .then(async (result) => {
       res.status(201).send(result);
     })
     .catch((err) => {
