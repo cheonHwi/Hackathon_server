@@ -78,7 +78,7 @@ indexRouter.post("/login", async (req: Request, res: Response) => {
   }
 });
 
-indexRouter.post("/save", async (req: Request, res: Response) => {
+indexRouter.post("/verify", async (req: Request, res: Response) => {
   const { id, name, unit, belong, date } = req.body;
   if (!name || !id) return res.sendStatus(400);
   userDataSave(id, name, unit, belong, date)

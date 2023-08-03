@@ -65,10 +65,9 @@ dataRouter.post(
     if (!file) {
       return res.status(400).json({ error: "No file uploaded." });
     }
-    if (!id) {
+    if (id == "null") {
       return res.sendStatus(402);
     }
-
     console.log(req.file?.filename);
     axios
       .post("http://127.0.0.1:8000/ocr_file", {
@@ -96,7 +95,7 @@ dataRouter.post(
         // res.send(result.data);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
         if (file_name && fs.existsSync(path.join(tmpFilePath, file_name))) {
           try {
             fs.unlinkSync(path.join(tmpFilePath, file_name));
