@@ -1,12 +1,13 @@
 import "dotenv/config";
 import axios from "axios";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import express, { Request, Response, Router } from "express";
 
 import {
   allUserFind,
   findOneUser,
   userDataSave,
+  userDataUpdate,
 } from "../controllers/user.controller";
 import { UserData } from "../types/physicalData";
 
@@ -66,7 +67,6 @@ indexRouter.post("/login", async (req: Request, res: Response) => {
       // 토큰 전달하기
       res
         .cookie("refreshToken", refreshToken, {
-          sameSite: "none",
           httpOnly: true,
         })
         .status(200)
@@ -88,6 +88,45 @@ indexRouter.post("/verify", async (req: Request, res: Response) => {
     .catch((err: any) => res.sendStatus(503));
 });
 
+indexRouter.post("/addAdditionalData", async (req: Request, res: Response) => {
+  const { id } = req.body;
+  if (!id) return res.sendStatus(402);
+  userDataUpdate(id, { ...req.body })
+    .then((result) => {
+      res.status(201).send(result);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(503);
+    });
+});
+
+indexRouter.get("/accessTokenRequest", async (req: Request, res: Response) => {
+  const authorization = req.headers["authorization"];
+
+  if (!authorization) {
+    return res
+      .status(400)
+      .json({ data: null, message: "invalid access token" });
+  }
+
+  const token = authorization.split(" ")[1]; // accessToken만 추출하기 위한 문법
+  const tokenData = jwt.verify(token, process.env.ACCESS_SECRET as string);
+  try {
+    const { id } = tokenData as JwtPayload;
+    findOneUser(id).then((result) => {
+      if (!result)
+        return res.json({
+          data: null,
+          message: "access token has been tempered",
+        });
+      return res.status(200).json(result);
+    });
+  } catch (err) {
+    res.sendStatus(500);
+  }
+});
+
 indexRouter.get("/find", async (req: Request, res: Response) => {
   allUserFind()
     .then((result: Array<object>) => {
@@ -96,20 +135,5 @@ indexRouter.get("/find", async (req: Request, res: Response) => {
     })
     .catch((err: any) => res.sendStatus(503));
 });
-
-// indexRouter.get("/update", async (req: Request, res: Response) => {
-//   const user = await userRepository.update(
-//     { id: "ryuwoong" },
-//     { id: "ryuwoong1" }
-//   );
-//   return res.status(200).json(user);
-// });
-
-// indexRouter.get("/ocr", async (req: Request, res: Response) => {
-//   inbody_result_OCR().then((labels: any) => {
-//     labels.forEach((label: any) => console.log(label.description));
-//     res.status(200).send(labels[0].description);
-//   });
-// });
 
 export default indexRouter;

@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import User from "./user";
 
 @Entity()
 export default class PhysicalData {
@@ -46,4 +54,8 @@ export default class PhysicalData {
 
   @Column({ type: "int", comment: "성장/인바디 점수" })
   inbody_score: number;
+
+  @ManyToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: "id", referencedColumnName: "id" })
+  user: User;
 }

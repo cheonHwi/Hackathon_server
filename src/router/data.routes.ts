@@ -24,6 +24,17 @@ dataRouter.post("/getCurrentInfo", async (req: Request, res: Response) => {
     .then((result) => res.json(result));
 });
 
+dataRouter.post("/squareChartData", async (req: Request, res: Response) => {
+  const { id } = req.body;
+  if (!id) return res.sendStatus(405);
+  physicalRepository
+    .findOne({ where: { id }, order: { idx: "DESC" } })
+    .then((result) => {
+      console.log(result);
+      res.json(result);
+    });
+});
+
 // 전체 랭킹 조회 api
 dataRouter.get("/rank", async (req: Request, res: Response) => {
   try {

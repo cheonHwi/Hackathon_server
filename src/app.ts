@@ -16,7 +16,7 @@ import googleRouter from "./router/google.routes";
 const app: express.Application = express();
 const PORT: string = process.env.PORT || "3000";
 
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 
 app.use(cookieParser());
 app.use(express.json());
