@@ -65,6 +65,9 @@ dataRouter.post(
     if (!file) {
       return res.status(400).json({ error: "No file uploaded." });
     }
+    if (!id) {
+      return res.sendStatus(402);
+    }
 
     console.log(req.file?.filename);
     axios
@@ -74,7 +77,7 @@ dataRouter.post(
       .then((result) => {
         if (result.status !== 200) return res.sendStatus(500);
         // console.log(result.data);
-        result.data["id"] = "110626999320798511586";
+        result.data["id"] = id;
         // 파일 삭제
         if (file_name && fs.existsSync(path.join(tmpFilePath, file_name))) {
           try {
